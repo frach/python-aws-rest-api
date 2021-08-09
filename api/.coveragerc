@@ -1,0 +1,8 @@
+
+[run]
+source =
+  src
+
+[report]
+show_missing = true
+fail_under = 50
