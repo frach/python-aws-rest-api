@@ -4,7 +4,7 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
-aws-lambda-decorators = "*"
+aws-lambda-powertools = "*"
 
 [dev-packages]
 boto3 = "*"

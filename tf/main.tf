@@ -32,14 +32,16 @@ module "api" {
   }
 
   integrations = {
-    "GET /health" = {
-      lambda_arn             = module.get_health_lambda.lambda_function_arn
+    "POST /items" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 3000
     }
 
-    "$default" = {
-      lambda_arn = module.get_health_lambda.lambda_function_arn
+    "GET /health" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
     }
   }
 
@@ -48,23 +50,28 @@ module "api" {
   }
 }
 
-# LAMBDAS
-module "get_health_lambda" {
+# LAMBDA
+module "api_lambda" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "${var.prefix}-${var.env}-get-health"
-  description   = "Simple healthcheck"
-  handler       = "handlers.get_health"
+  function_name = "${var.prefix}-${var.env}-api-lambda"
+  description   = "A lambda for all of the API requests."
+  handler       = "main.lambda_handler"
   runtime       = var.lambda_runtime
 
   publish = true
 
-  source_path = "../api/dist"
+  source_path            = "../api/dist"
   create_package         = false
   local_existing_package = "../api/dist/lambda.zip"
 
+  environment_variables = {
+    POWERTOOLS_SERVICE_NAME        = "${var.api_name}"
+    POWERTOOLS_EVENT_HANDLER_DEBUG = false
+  }
+
   tags = {
-    Name = "${var.prefix}-${var.env}-get-health"
+    Name = "${var.prefix}-${var.env}-api-lambda"
   }
 
   allowed_triggers = {

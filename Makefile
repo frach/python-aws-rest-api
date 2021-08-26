@@ -36,7 +36,7 @@ update-dist: $(API_DIR)/$(DIST_DIR)
 
 zip-dist: update-dist
 	$(info Packing current '$(DIST_DIR)' directory into $(ARTIFACT_KEY).)
-	@cd $(API_DIR)/$(DIST_DIR) && zip $(ARTIFACT_KEY) *
+	@cd $(API_DIR)/$(DIST_DIR) && zip -rq $(ARTIFACT_KEY) *
 
 
 # DEPLOYMENT
