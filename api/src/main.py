@@ -18,6 +18,16 @@ def post_items():
     json_payload = app.current_event.json_body
     validate(event=json_payload, schema=schemas.ITEM_POST_INPUT_SCHEMA)      # raises SchemaValidationError handled in error_catcher
 
+@app.get('/items')
+@error_catcher
+def get_items():
+    return {'items': [{'item1': 123, 'item2': 345}]}
+
+@app.get('/item/<name>')
+@error_catcher
+def get_item(name):
+    return {'item': {name: 'some_value'}}
+
 @app.get('/health')
 def get_health():
     return {'status': 'OK'}

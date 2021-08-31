@@ -32,6 +32,18 @@ module "api" {
   }
 
   integrations = {
+    "GET /item/{name+}" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
+    "GET /items" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
     "POST /items" = {
       lambda_arn             = module.api_lambda.lambda_function_arn
       payload_format_version = "2.0"
