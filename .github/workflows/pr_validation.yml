@@ -1,11 +1,9 @@
-name: Deployment of the API after merging into master.
+name: Running tests for the Pull Request
 
-on:
-  push:
-    branches: [master]
+on: pull_request
 
 jobs:
-  unittests:
+  unit_tests:
     name: Unittests
     runs-on: ubuntu-latest
 
@@ -23,4 +21,6 @@ jobs:
           python -m pip install --upgrade pipenv wheel
 
       - name: Run unittests
-        run: make deploy-api
+        run: make tests-unittests
+
+  # integration_or_e2e_tests: TODO - deploying an app on AWS and running some real API requests
