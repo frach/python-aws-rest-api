@@ -3,6 +3,7 @@ from aws_lambda_powertools.logging import correlation_paths
 from aws_lambda_powertools.event_handler.api_gateway import ApiGatewayResolver, ProxyEventType
 from aws_lambda_powertools.utilities.validation import validate
 
+import settings
 import schemas
 from decorators import error_catcher
 
@@ -26,7 +27,7 @@ def get_items():
 @app.get('/item/<name>')
 @error_catcher
 def get_item(name):
-    return {'item': {name: 'some_value'}}
+    return {'item': {name: settings.DDB_ITEMS_TABLE_NAME}}
 
 @app.get('/health')
 def get_health():

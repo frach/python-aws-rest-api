@@ -1,7 +1,5 @@
-import json
 from functools import wraps
 
-from aws_lambda_powertools.event_handler.api_gateway import Response
 from aws_lambda_powertools.utilities.validation.exceptions import SchemaValidationError
 from aws_lambda_powertools.event_handler.exceptions import BadRequestError
 

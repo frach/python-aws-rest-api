@@ -5,6 +5,7 @@ verify_ssl = true
 
 [packages]
 aws-lambda-powertools = "*"
+python-decouple = "*"
 
 [dev-packages]
 boto3 = "*"

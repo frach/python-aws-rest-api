@@ -14,10 +14,15 @@ variable "region" {
   type = string
 }
 
-variable "prefix" {
+variable "project" {
   type = string
 }
 
 variable "api_name" {
   type = string
+}
+
+variable "lambda_envs" {
+  type        = map(string)
+  description = "Configuration passed to Lambdas as environment variables."
 }

@@ -20,7 +20,7 @@ provider "aws" {
 module "api" {
   source = "terraform-aws-modules/apigateway-v2/aws"
 
-  name                   = "${var.prefix}-${var.env}-api"
+  name                   = "${var.project}-${var.env}-api"
   description            = "API for lambdas"
   protocol_type          = "HTTP"
   create_api_domain_name = false
@@ -58,7 +58,7 @@ module "api" {
   }
 
   tags = {
-    Name = "${var.prefix}-${var.env}-api"
+    Name = "${var.project}-${var.env}-api"
   }
 }
 
@@ -66,7 +66,7 @@ module "api" {
 module "api_lambda" {
   source = "terraform-aws-modules/lambda/aws"
 
-  function_name = "${var.prefix}-${var.env}-api-lambda"
+  function_name = "${var.project}-${var.env}-api-lambda"
   description   = "A lambda for all of the API requests."
   handler       = "main.lambda_handler"
   runtime       = var.lambda_runtime
@@ -78,12 +78,14 @@ module "api_lambda" {
   local_existing_package = "../api/dist/lambda.zip"
 
   environment_variables = {
-    POWERTOOLS_SERVICE_NAME        = "${var.api_name}"
-    POWERTOOLS_EVENT_HANDLER_DEBUG = false
+    DDB_ITEMS_TABLE_NAME           = module.dynamodb_table.dynamodb_table_id
+    LOG_LEVEL                      = var.lambda_envs["log_level"]
+    POWERTOOLS_SERVICE_NAME        = var.api_name
+    POWERTOOLS_EVENT_HANDLER_DEBUG = var.lambda_envs["powertools_event_handler_debug"]
   }
 
   tags = {
-    Name = "${var.prefix}-${var.env}-api-lambda"
+    Name = "${var.project}-${var.env}-api-lambda"
   }
 
   allowed_triggers = {
@@ -91,5 +93,24 @@ module "api_lambda" {
       service    = "apigateway"
       source_arn = "${module.api.apigatewayv2_api_execution_arn}/*/*/*"
     }
+  }
+}
+
+# DYNAMODB
+module "dynamodb_table" {
+  source   = "terraform-aws-modules/dynamodb-table/aws"
+
+  name     = "${var.project}-${var.env}-items"
+  hash_key = "item_id"
+
+  attributes = [
+    {
+      name = "item_id"
+      type = "S"
+    }
+  ]
+
+  tags = {
+    Name = "${var.project}-${var.env}-items"
   }
 }
