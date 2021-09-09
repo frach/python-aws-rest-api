@@ -6,6 +6,7 @@ from aws_lambda_powertools.utilities.validation import validate
 import settings
 import schemas
 from decorators import error_catcher
+from utils import get_all_items
 
 
 logger = Logger()
@@ -22,9 +23,9 @@ def post_items():
 @app.get('/items')
 @error_catcher
 def get_items():
-    return {'items': [{'item1': 123, 'item2': 345}]}
+    return get_all_items()
 
-@app.get('/item/<name>')
+@app.get('/items/<name>')
 @error_catcher
 def get_item(name):
     return {'item': {name: settings.DDB_ITEMS_TABLE_NAME}}

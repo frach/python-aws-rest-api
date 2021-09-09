@@ -32,7 +32,7 @@ module "api" {
   }
 
   integrations = {
-    "GET /item/{name+}" = {
+    "GET /items/{name+}" = {
       lambda_arn             = module.api_lambda.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 3000
@@ -70,22 +70,16 @@ module "api_lambda" {
   description   = "A lambda for all of the API requests."
   handler       = "main.lambda_handler"
   runtime       = var.lambda_runtime
-
   publish = true
 
-  source_path            = "../api/dist"
   create_package         = false
   local_existing_package = "../api/dist/lambda.zip"
 
   environment_variables = {
-    DDB_ITEMS_TABLE_NAME           = module.dynamodb_table.dynamodb_table_id
+    DDB_ITEMS_TABLE_NAME           = module.items_table.dynamodb_table_id
     LOG_LEVEL                      = var.lambda_envs["log_level"]
     POWERTOOLS_SERVICE_NAME        = var.api_name
     POWERTOOLS_EVENT_HANDLER_DEBUG = var.lambda_envs["powertools_event_handler_debug"]
-  }
-
-  tags = {
-    Name = "${var.project}-${var.env}-api-lambda"
   }
 
   allowed_triggers = {
@@ -94,10 +88,32 @@ module "api_lambda" {
       source_arn = "${module.api.apigatewayv2_api_execution_arn}/*/*/*"
     }
   }
+
+  attach_policy_statements = true
+  policy_statements = {
+    ddb_items_table_perms = {
+      effect    = "Allow",
+      actions   = [
+        "dynamodb:BatchGetItem",
+        "dynamodb:BatchWriteItem",
+        "dynamodb:DeleteItem",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem",
+        "dynamodb:Query",
+        "dynamodb:Scan",
+        "dynamodb:UpdateItem",
+      ],
+      resources = [module.items_table.dynamodb_table_arn]
+    }
+  }
+
+  tags = {
+    Name = "${var.project}-${var.env}-api-lambda"
+  }
 }
 
 # DYNAMODB
-module "dynamodb_table" {
+module "items_table" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
   name     = "${var.project}-${var.env}-items"
