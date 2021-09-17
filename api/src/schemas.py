@@ -10,6 +10,7 @@ ITEM_POST_INPUT_SCHEMA = {
             "type": "string",
             "title": "The name of the item",
             "examples": ["item_name_1"],
+            "minLength": 1,
             "maxLength": 100,
         },
     },

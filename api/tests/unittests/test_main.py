@@ -5,6 +5,7 @@ from main import get_health, lambda_handler
 import pytest
 from dataclasses import dataclass
 
+
 class HealthGetTestCase(TestCase):
     def test_get_health(self):
         response = get_health()

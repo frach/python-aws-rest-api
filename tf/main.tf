@@ -118,11 +118,26 @@ module "items_table" {
 
   name     = "${var.project}-${var.env}-items"
   hash_key = "item_id"
+  billing_mode = "PAY_PER_REQUEST"
 
   attributes = [
     {
       name = "item_id"
       type = "S"
+    },
+    {
+      name = "item_name"
+      type = "S"
+    }
+  ]
+
+  global_secondary_indexes = [
+    {
+      name = "${var.project}-${var.env}-items-names"
+      hash_key = "item_name"
+      billing_mode = "PAY_PER_REQUEST"
+      projection_type = "INCLUDE"
+      non_key_attributes = ["item_id"]
     }
   ]
 
