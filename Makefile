@@ -31,7 +31,7 @@ $(API_DIR)/$(DIST_DIR): $(VENV_DIR)
 
 update-dist: $(API_DIR)/$(DIST_DIR)
 	$(info Updating existing dist directory with current code ($(API_DIR)/src/* -> $(API_DIR)/$(DIST_DIR)/*).)
-	@cd $(API_DIR) && cp -rf src/*.py $(DIST_DIR)/
+	@cd $(API_DIR)/$(SRC_DIR) && find . -name "*.py" -type f -print | cpio -pdm ../$(DIST_DIR)
 	@echo "Updated!"
 
 zip-dist: update-dist
