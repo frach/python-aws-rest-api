@@ -4,8 +4,9 @@ url = "https://pypi.python.org/simple"
 verify_ssl = true
 
 [packages]
-aws-lambda-powertools = "*"
-python-decouple = "*"
+aws-lambda-powertools = "1.20.2"
+python-decouple = "3.4"
+pynamodb = "5.1.0"
 
 [dev-packages]
 boto3 = "*"

@@ -7,7 +7,6 @@ api_name = "FILLME"
 lambda_runtime = "python3.8"
 
 lambda_envs = {
-    ddb_items_table_name = "FILLME"
     log_level = "INFO"
     powertools_event_handler_debug = false
 }

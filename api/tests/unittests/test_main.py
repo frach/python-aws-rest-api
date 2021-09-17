@@ -13,7 +13,7 @@ class HealthGetTestCase(TestCase):
 
 
 # class A:
-#     function_name = 'dupa'
+#     function_name = 'fads'
 #     memory_limit_in_mb = 128
 #     invoked_function_arn = 'some_arn'
 #     aws_request_id = 'dsa'

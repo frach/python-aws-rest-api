@@ -16,6 +16,10 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
+locals {
+  items_table_gsi_name = "${var.project}-${var.env}-items-gsi-name"
+}
+
 # API GATEWAY
 module "api" {
   source = "terraform-aws-modules/apigateway-v2/aws"
@@ -76,7 +80,8 @@ module "api_lambda" {
   local_existing_package = "../api/dist/lambda.zip"
 
   environment_variables = {
-    DDB_ITEMS_TABLE_NAME           = module.items_table.dynamodb_table_id
+    DDB_ITEMS_TABLE           = module.items_table.dynamodb_table_id
+    DDB_ITEMS_GSI_NAME          = local.items_table_gsi_name
     LOG_LEVEL                      = var.lambda_envs["log_level"]
     POWERTOOLS_SERVICE_NAME        = var.api_name
     POWERTOOLS_EVENT_HANDLER_DEBUG = var.lambda_envs["powertools_event_handler_debug"]
@@ -97,6 +102,7 @@ module "api_lambda" {
         "dynamodb:BatchGetItem",
         "dynamodb:BatchWriteItem",
         "dynamodb:DeleteItem",
+        "dynamodb:DescribeTable",
         "dynamodb:GetItem",
         "dynamodb:PutItem",
         "dynamodb:Query",
@@ -104,6 +110,13 @@ module "api_lambda" {
         "dynamodb:UpdateItem",
       ],
       resources = [module.items_table.dynamodb_table_arn]
+    }
+    ddb_items_gsi_name_perms = {
+      effect = "Allow",
+      actions = [
+        "dynamodb:Query"
+      ],
+      resources = ["${module.items_table.dynamodb_table_arn}/index/${local.items_table_gsi_name}"]
     }
   }
 
@@ -117,27 +130,27 @@ module "items_table" {
   source   = "terraform-aws-modules/dynamodb-table/aws"
 
   name     = "${var.project}-${var.env}-items"
-  hash_key = "item_id"
+  hash_key = "id"
   billing_mode = "PAY_PER_REQUEST"
 
   attributes = [
     {
-      name = "item_id"
+      name = "id"
       type = "S"
     },
     {
-      name = "item_name"
+      name = "name"
       type = "S"
     }
   ]
 
   global_secondary_indexes = [
     {
-      name = "${var.project}-${var.env}-items-names"
-      hash_key = "item_name"
+      name = local.items_table_gsi_name
+      hash_key = "name"
       billing_mode = "PAY_PER_REQUEST"
       projection_type = "INCLUDE"
-      non_key_attributes = ["item_id"]
+      non_key_attributes = ["id"]
     }
   ]
 
