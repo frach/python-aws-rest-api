@@ -9,4 +9,5 @@ lambda_runtime = "python3.8"
 lambda_envs = {
     log_level = "INFO"
     powertools_event_handler_debug = false
+    powertools_logger_log_event = false
 }

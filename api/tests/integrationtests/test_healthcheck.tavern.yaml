@@ -1,0 +1,14 @@
+---
+test_name: Simple health-check test
+
+stages:
+  - name: Make a simple request to healthcheck endpoint
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/health"
+      method: GET
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      json:
+        status: OK

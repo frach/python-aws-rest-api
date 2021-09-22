@@ -9,7 +9,7 @@ VENV_DIR := $(API_DIR)/.venv
 ARTIFACT_KEY := lambda.zip
 
 PIPENV_EXEC := PIPENV_VENV_IN_PROJECT=true PIPENV_PIPFILE=$(API_DIR)/Pipfile pipenv
-PYTEST_COMMAND := PYTHONPATH=$(SRC_DIR) pipenv run pytest -ra -v
+PYTEST_COMMAND := PYTHONPATH=$(SRC_DIR) pipenv run pytest -ra -vv
 
 
 # INFRA
@@ -49,3 +49,7 @@ destroy-api: tf-destroy
 tests-unittests: $(VENV_DIR)
 	$(info Recreating VENV and running unttests.)
 	cd $(API_DIR) && $(PYTEST_COMMAND) --cov --cov-report=term-missing:skip-covered tests/unittests
+
+tests-integrationtests: $(VENV_DIR)
+	$(info Recreating VENV and running unttests.)
+	cd $(API_DIR) && $(PYTEST_COMMAND) tests/integrationtests

@@ -16,10 +16,6 @@ provider "aws" {
   skip_requesting_account_id = false
 }
 
-locals {
-  items_table_gsi_name = "${var.project}-${var.env}-items-gsi-name"
-}
-
 # API GATEWAY
 module "api" {
   source = "terraform-aws-modules/apigateway-v2/aws"
@@ -36,12 +32,6 @@ module "api" {
   }
 
   integrations = {
-    "GET /items/{name+}" = {
-      lambda_arn             = module.api_lambda.lambda_function_arn
-      payload_format_version = "2.0"
-      timeout_milliseconds   = 3000
-    }
-
     "GET /items" = {
       lambda_arn             = module.api_lambda.lambda_function_arn
       payload_format_version = "2.0"
@@ -49,6 +39,30 @@ module "api" {
     }
 
     "POST /items" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
+    "GET /items/{item_id+}" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
+    "PUT /items/{item_id+}" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
+    "DELETE /items/{item_id+}" = {
+      lambda_arn             = module.api_lambda.lambda_function_arn
+      payload_format_version = "2.0"
+      timeout_milliseconds   = 3000
+    }
+
+    "GET /error/{code+}" = {
       lambda_arn             = module.api_lambda.lambda_function_arn
       payload_format_version = "2.0"
       timeout_milliseconds   = 3000
@@ -81,10 +95,10 @@ module "api_lambda" {
 
   environment_variables = {
     DDB_ITEMS_TABLE           = module.items_table.dynamodb_table_id
-    DDB_ITEMS_GSI_NAME          = local.items_table_gsi_name
     LOG_LEVEL                      = var.lambda_envs["log_level"]
-    POWERTOOLS_SERVICE_NAME        = var.api_name
     POWERTOOLS_EVENT_HANDLER_DEBUG = var.lambda_envs["powertools_event_handler_debug"]
+    POWERTOOLS_LOGGER_LOG_EVENT    = var.lambda_envs["powertools_logger_log_event"]
+    POWERTOOLS_SERVICE_NAME        = var.api_name
   }
 
   allowed_triggers = {
@@ -111,13 +125,6 @@ module "api_lambda" {
       ],
       resources = [module.items_table.dynamodb_table_arn]
     }
-    ddb_items_gsi_name_perms = {
-      effect = "Allow",
-      actions = [
-        "dynamodb:Query"
-      ],
-      resources = ["${module.items_table.dynamodb_table_arn}/index/${local.items_table_gsi_name}"]
-    }
   }
 
   tags = {
@@ -137,20 +144,6 @@ module "items_table" {
     {
       name = "id"
       type = "S"
-    },
-    {
-      name = "name"
-      type = "S"
-    }
-  ]
-
-  global_secondary_indexes = [
-    {
-      name = local.items_table_gsi_name
-      hash_key = "name"
-      billing_mode = "PAY_PER_REQUEST"
-      projection_type = "INCLUDE"
-      non_key_attributes = ["id"]
     }
   ]
 
