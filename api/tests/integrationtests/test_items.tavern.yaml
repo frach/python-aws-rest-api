@@ -13,7 +13,6 @@ stages:
       headers:
         content-type: application/json
       json:
-        statusCode: 400
         message: "Failed schema validation. Error: data must not contain {{'non_existing_key'}} properties, Path: ['data'],
           Data: {{'name': 'Test Item Number One', 'non_existing_key': 'some_value'}}"
 
@@ -28,62 +27,59 @@ stages:
       headers:
         content-type: application/json
       json:
-        statusCode: 400
         message: "Failed schema validation. Error: data must contain ['name'] properties, Path: ['data'],
           Data: {{'non_existing_key': 'some_value'}}"
 
 ---
-test_name: Post an item with the same name
+test_name: Post a couple of items and list all of them at once.
 stages:
-  - name: Make sure item doesn't exist.
+  - name: Make sure first item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two"
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two-first"
       method: DELETE
     response:
       status_code: [200, 404]
 
-  - name: Create an item with optional parameter.
+  - name: Make sure second item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
-      method: POST
-      json:
-        name: Test Item Number Two
-    response:
-      status_code: 200
-      headers:
-        content-type: application/json
-      json:
-        item:
-          id: test-item-number-two
-          name: Test Item Number Two
-
-  - name: Repeat the item creation request with the same name.
-    request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
-      method: POST
-      json:
-        name: Test Item Number Two
-    response:
-      status_code: 400
-      headers:
-        content-type: application/json
-      json:
-        statusCode: 400
-        message: The item already exists.
-
-  - name: Remove the item.
-    request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two"
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two-second"
       method: DELETE
     response:
+      status_code: [200, 404]
+
+  - name: Post first item.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      method: POST
+      json:
+        name: Test Item Number Two First
+    response:
+      status_code: 200
+
+  - name: Post second item.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      method: POST
+      json:
+        name: Test Item Number Two Second
+    response:
+      status_code: 200
+
+  - name: Get list of both items.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      method: GET
+    response:
       status_code: 200
       json:
-        item:
-          id: test-item-number-two
-          name: Test Item Number Two
+        items:
+          - id: test-item-number-two-first
+            name: Test Item Number Two First
+          - id: test-item-number-two-second
+            name: Test Item Number Two Second
 
 ---
-test_name: Create an item and modify it.
+test_name: Post an item with the same name
 stages:
   - name: Make sure item doesn't exist.
     request:
@@ -98,13 +94,62 @@ stages:
       method: POST
       json:
         name: Test Item Number Three
+    response:
+      status_code: 200
+      headers:
+        content-type: application/json
+      json:
+        item:
+          id: test-item-number-three
+          name: Test Item Number Three
+
+  - name: Repeat the item creation request with the same name.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      method: POST
+      json:
+        name: Test Item Number Three
+    response:
+      status_code: 400
+      headers:
+        content-type: application/json
+      json:
+        message: The item already exists.
+
+  - name: Remove the item.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-three"
+      method: DELETE
+    response:
+      status_code: 200
+      json:
+        item:
+          id: test-item-number-three
+          name: Test Item Number Three
+
+---
+test_name: Create an item and modify it.
+stages:
+  - name: Make sure item doesn't exist.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
+      method: DELETE
+    response:
+      status_code: [200, 404]
+
+  - name: Create an item with optional parameter.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      method: POST
+      json:
+        name: Test Item Number Four
         optional_attr: some-optonal-value
     response:
       status_code: 200
 
   - name: Modify optional attribute.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-three"
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
       method: PUT
       json:
         optional_attr: some-modified-value
@@ -112,48 +157,46 @@ stages:
       status_code: 200
       json:
         item:
-          id: test-item-number-three
-          name: Test Item Number Three
+          id: test-item-number-four
+          name: Test Item Number Four
           optional_attr: some-modified-value
 
   - name: Get the updated item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-three"
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
       method: GET
     response:
       status_code: 200
       json:
         item:
-          id: test-item-number-three
-          name: Test Item Number Three
+          id: test-item-number-four
+          name: Test Item Number Four
           optional_attr: some-modified-value
 
   - name: Remove the item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/tvrn-put-test3-item"
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
       method: DELETE
 
-# ---
-# test_name: Modify non-existing item.
-# stages:
-#   - name: Ensure an item doesn't exist.
-#     request:
-#       url: "https://{tavern.env_vars.API_BASE_URL}/items/tvrn-put-test4-item"
-#       method: GET
-#     response:
-#       status_code: 404
-#       json:
-#         statusCode: 404
-#         message: Not found
+---
+test_name: Modify non-existing item.
+stages:
+  - name: Ensure an item doesn't exist.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-five"
+      method: GET
+    response:
+      status_code: 404
+      json:
+        message: Not found
 
-#   - name: Try to modify a non-existing item.
-#     request:
-#       url: "https://{tavern.env_vars.API_BASE_URL}/items/tvrn-put-test4-item"
-#       method: PUT
-#       json:
-#         optional_attr: modified-attribute
-#     response:
-#       status_code: 404
-#       json:
-#         statusCode: 404
-#         message: Not found
+  - name: Try to modify a non-existing item.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-five"
+      method: PUT
+      json:
+        optional_attr: modified-attribute
+    response:
+      status_code: 404
+      json:
+        message: Not found

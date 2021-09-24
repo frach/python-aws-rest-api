@@ -6,7 +6,7 @@ from aws_lambda_powertools.event_handler.exceptions import BadRequestError, NotF
 
 import validation_schemas
 
-from decorators import endpoint_wrapper
+from decorators import endpoint_wrapper, handler_wrapper
 from models import Item
 from utils import convert_to_kebab_case
 
@@ -22,16 +22,14 @@ def post_items():
     json_payload = app.current_event.json_body
     validate(event=json_payload, schema=validation_schemas.ITEM_POST_INPUT_SCHEMA)      # raises SchemaValidationError handled in endpoint_wrapper
 
-    new_item_name = json_payload['name']
-    new_item_id = convert_to_kebab_case(new_item_name)
-    del json_payload['name']
+    new_item_id = convert_to_kebab_case(json_payload['name'])
 
     try:
-        new_item = Item(new_item_id, name=new_item_name, **json_payload)
-        new_item.refresh()
+        Item.get(new_item_id)
 
         raise BadRequestError('The item already exists.')
-    except new_item.DoesNotExist:
+    except Item.DoesNotExist:
+        new_item = Item(new_item_id, **json_payload)
         new_item.save()
 
         return {'item': new_item.to_dict()}
@@ -46,10 +44,7 @@ def get_items():
 @app.get('/items/<item_id>')
 @endpoint_wrapper
 def get_item(item_id):
-    try:
-        return {'item': Item.get(item_id).to_dict()}
-    except Item.DoesNotExist:
-        raise NotFoundError
+    return {'item': Item.get(item_id).to_dict()}
 
 
 @app.put('/items/<item_id>')
@@ -58,12 +53,9 @@ def modify_item(item_id):
     json_payload = app.current_event.json_body
     validate(event=json_payload, schema=validation_schemas.ITEM_PUT_INPUT_SCHEMA)
 
-    try:
-        item = Item.get(item_id)
-    except Item.DoesNotExist:
-        raise NotFoundError
-
     attrs_to_change = [(getattr(Item, attr_name), attr_value) for attr_name, attr_value in json_payload.items()]
+
+    item = Item.get(item_id)
     item.update(actions=[attr.set(attr_value) for attr, attr_value in attrs_to_change])
 
     return {'item': item.to_dict()}
@@ -72,13 +64,10 @@ def modify_item(item_id):
 @app.delete('/items/<item_id>')
 @endpoint_wrapper
 def delete_item(item_id):
-    try:
-        item = Item.get(item_id)
-        item.delete()
+    item = Item.get(item_id)
+    item.delete()
 
-        return {'item': item.to_dict()}
-    except Item.DoesNotExist:
-        raise NotFoundError
+    return {'item': item.to_dict()}
 
 
 # This endpoint should be removed once in production, it just simulates error responses
@@ -103,5 +92,6 @@ def get_health():
 
 # HANDLERS
 @logger.inject_lambda_context(correlation_id_path=correlation_paths.API_GATEWAY_HTTP)
+@handler_wrapper
 def lambda_handler(event, context):
     return app.resolve(event, context)

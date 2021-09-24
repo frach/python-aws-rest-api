@@ -1,0 +1,46 @@
+---
+test_name: Testing artificial /error endpoints.
+stages:
+  - name: Raise artificial error 404 on purpose.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/error/404"
+      method: GET
+    response:
+      status_code: 404
+      headers:
+        content-type: application/json
+      json:
+        message: Not found
+
+  - name: Raise artificial error 400 on purpose.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/error/400"
+      method: GET
+    response:
+      status_code: 400
+      headers:
+        content-type: application/json
+      json:
+        message: /error 400 request
+
+  - name: Raise artificial error 500 on purpose.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/error/500"
+      method: GET
+    response:
+      status_code: 500
+      headers:
+        content-type: application/json
+      json:
+        message: Unknown error occurred.
+
+  - name: Raise artificial error unknown on purpose.
+    request:
+      url: "https://{tavern.env_vars.API_BASE_URL}/error/1234567890"
+      method: GET
+    response:
+      status_code: 500
+      headers:
+        content-type: application/json
+      json:
+        message: Unknown error occurred.
