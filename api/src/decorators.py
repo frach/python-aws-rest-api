@@ -27,7 +27,7 @@ def endpoint_wrapper(endpoint_function):
             raise BadRequestError(str(e))
         except (NotFoundError, Item.DoesNotExist):
             raise NotFoundError
-        except Exception as e:
+        except Exception:
             logger.critical(traceback.format_exc())
             raise InternalServerError('Unknown error occurred.')
 
