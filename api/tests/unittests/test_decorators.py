@@ -9,14 +9,11 @@ class HandlerWrapperTestCase(TestCase):
         def decorated(event, context):
             return {'body': '{"message": "test_msg", "statusCode": 404, "another_body_attr": "value"}'}
 
-        self.assertEqual(decorated(None, None), {'body': '{"message": "test_msg", "another_body_attr": "value"}'})
+        self.assertEqual(decorated({}, None), {'body': '{"message": "test_msg", "another_body_attr": "value"}'})
 
     def test_removing_keys_from_body_with_no_body(self):
         @handler_wrapper
         def decorated(event, context):
             return {'not_body_key': 'not_body_value'}
 
-        self.assertEqual(decorated(None, None), {'not_body_key': 'not_body_value'})
-
-
-# TODO: Add endpoint_wrapper
+        self.assertEqual(decorated({}, None), {'not_body_key': 'not_body_value'})

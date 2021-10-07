@@ -1,3 +1,4 @@
+import boto3
 import sys, traceback
 
 from functools import wraps
@@ -10,7 +11,7 @@ from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 from aws_lambda_powertools.utilities.validation.exceptions import SchemaValidationError
 
 from models import Item
-from utils import remove_keys_from_dumped_json
+from utils import get_user_details, remove_keys_from_dumped_json
 
 
 logger = Logger(child=True)
@@ -36,8 +37,15 @@ def endpoint_wrapper(endpoint_function):
 
 @lambda_handler_decorator
 def handler_wrapper(handler, event, context):
+    # If user is logged in, inject user's details into 'user' key before the handler starts
+    if 'authorizer' in event.get('requestContext', {}) and 'authorization' in event.get('headers', {}):
+        token = event['headers']['authorization'].split()[1]
+        event['user'] = get_user_details(token)
+
+    # Trigger an actual handler
     response = handler(event, context)
 
+    # Remove redundant 'statusCode' key from the response
     if 'body' in response:
         response['body'] = remove_keys_from_dumped_json(response['body'], keys_to_remove=['statusCode'])
 

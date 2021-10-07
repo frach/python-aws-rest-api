@@ -15,6 +15,9 @@ PYTEST_COMMAND := PYTHONPATH=$(SRC_DIR) pipenv run pytest -ra -vv
 # INFRA
 -include ./Makefile_tf.mk
 
+# USER MANAGEMENT
+-include ./Makefile_cognito.mk
+
 
 # CODE
 clean:
@@ -46,10 +49,17 @@ destroy-api: tf-destroy
 
 
 # TESTING
+INTEGRATIONTESTS_ENVFILE := $(API_DIR)/integrationtests.env
+
+$(INTEGRATIONTESTS_ENVFILE):
+	$(info Creating envfile for )
+	$(eval result := $(shell cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json))
+	@cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json > tmp
+
 tests-unittests: $(VENV_DIR)
 	$(info Recreating VENV and running unttests.)
 	cd $(API_DIR) && $(PYTEST_COMMAND) --cov --cov-report=term-missing:skip-covered tests/unittests
 
 tests-integrationtests: $(VENV_DIR)
 	$(info Recreating VENV and running unttests.)
-	cd $(API_DIR) && $(PYTEST_COMMAND) tests/integrationtests
+	cd $(API_DIR) && export TEST_USERNAME=$(TEST_USERNAME) && export TEST_PASSWORD=$(TEST_PASSWORD) && export TEST_CLIENTID=$(TEST_CLIENTID) && $(PYTEST_COMMAND) tests/integrationtests

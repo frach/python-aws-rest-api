@@ -9,6 +9,11 @@ VAR_FILE := $(ENVS_DIR)/$(ENV).tfvars
 TERRAFORM_PARAMS := -var-file $(VAR_FILE)
 
 
+define tf-output
+	cd tf && $(TERRAFORM_EXEC) output -json
+endef
+
+
 $(TERRAFORM_EXEC):
 	curl https://releases.hashicorp.com/terraform/$(TERRAFORM_VERSION)/$(TERRAFORM_PKG) -o $(TERRAFORM_PKG)
 	unzip $(TERRAFORM_PKG)
@@ -26,6 +31,10 @@ tf-apply-force: $(TERRAFORM_EXEC)
 tf-destroy: $(TERRAFORM_EXEC)
 	@cd $(INFRA_DIR) && \
 	$(TERRAFORM_EXEC) destroy -$(TERRAFORM_PARAMS)
+
+tf-output: $(TERRAFORM_EXEC)
+	@cd $(INFRA_DIR) && \
+	$(TERRAFORM_EXEC) output -json
 
 tf-fmt: $(TERRAFORM_EXEC)
 	@cd $(INFRA_DIR) && \

@@ -3,8 +3,10 @@ test_name: Post items with wrong input data.
 stages:
   - name: Try to create an item with "non_existing_key" next to "name".
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: https://{tavern.env_vars.TEST_API_BASE_URL}/items
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         name: Test Item Number One
         non_existing_key: some_value
@@ -18,8 +20,10 @@ stages:
 
   - name: Try to create an item with "non_existing_key" without "name".
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         non_existing_key: some_value
     response:
@@ -35,22 +39,28 @@ test_name: Post a couple of items and list all of them at once.
 stages:
   - name: Make sure first item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two-first"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-two-first"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: [200, 404]
 
   - name: Make sure second item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-two-second"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-two-second"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: [200, 404]
 
   - name: Post first item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         name: Test Item Number Two First
     response:
@@ -58,8 +68,10 @@ stages:
 
   - name: Post second item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         name: Test Item Number Two Second
     response:
@@ -67,8 +79,12 @@ stages:
 
   - name: Get list of both items.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       json:
@@ -83,17 +99,21 @@ test_name: Post an item with the same name
 stages:
   - name: Make sure item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-three"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-three"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: [200, 404]
 
   - name: Create an item with optional parameter.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
       json:
         name: Test Item Number Three
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       headers:
@@ -105,8 +125,10 @@ stages:
 
   - name: Repeat the item creation request with the same name.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         name: Test Item Number Three
     response:
@@ -118,8 +140,10 @@ stages:
 
   - name: Remove the item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-three"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-three"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       json:
@@ -132,15 +156,19 @@ test_name: Create an item and modify it.
 stages:
   - name: Make sure item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-four"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: [200, 404]
 
   - name: Create an item with optional parameter.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items"
       method: POST
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         name: Test Item Number Four
         optional_attr: some-optonal-value
@@ -149,8 +177,10 @@ stages:
 
   - name: Modify optional attribute.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-four"
       method: PUT
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         optional_attr: some-modified-value
     response:
@@ -163,8 +193,10 @@ stages:
 
   - name: Get the updated item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-four"
       method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       json:
@@ -175,16 +207,20 @@ stages:
 
   - name: Remove the item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-four"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-four"
       method: DELETE
+      headers:
+        Authorization: "Bearer {access_token}"
 
 ---
 test_name: Modify non-existing item.
 stages:
   - name: Ensure an item doesn't exist.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-five"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-five"
       method: GET
+      headers:
+        Authorization: "Bearer {access_token}"
     response:
       status_code: 404
       json:
@@ -192,8 +228,10 @@ stages:
 
   - name: Try to modify a non-existing item.
     request:
-      url: "https://{tavern.env_vars.API_BASE_URL}/items/test-item-number-five"
+      url: "https://{tavern.env_vars.TEST_API_BASE_URL}/items/test-item-number-five"
       method: PUT
+      headers:
+        Authorization: "Bearer {access_token}"
       json:
         optional_attr: modified-attribute
     response:
