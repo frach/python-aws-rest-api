@@ -49,17 +49,14 @@ destroy-api: tf-destroy
 
 
 # TESTING
-INTEGRATIONTESTS_ENVFILE := $(API_DIR)/integrationtests.env
-
-$(INTEGRATIONTESTS_ENVFILE):
-	$(info Creating envfile for )
-	$(eval result := $(shell cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json))
-	@cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json > tmp
-
 tests-unittests: $(VENV_DIR)
-	$(info Recreating VENV and running unttests.)
-	cd $(API_DIR) && $(PYTEST_COMMAND) --cov --cov-report=term-missing:skip-covered tests/unittests
+	$(info Running unittests.)
+	@cd $(API_DIR) && $(PYTEST_COMMAND) --cov --cov-report=term-missing:skip-covered tests/unittests
 
 tests-integrationtests: $(VENV_DIR)
-	$(info Recreating VENV and running unttests.)
-	cd $(API_DIR) && export TEST_USERNAME=$(TEST_USERNAME) && export TEST_PASSWORD=$(TEST_PASSWORD) && export TEST_CLIENTID=$(TEST_CLIENTID) && $(PYTEST_COMMAND) tests/integrationtests
+	$(info Getting outputs from terraform and running integration tests.)
+	$(eval outputs_json := `cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json`)
+	$(eval api_endpoint := $(shell echo "$(outputs_json)" | jq -r .api_api_endpoint.value))
+	$(eval client_id := $(shell echo "$(outputs_json)" | jq -r .user_pool_client_id.value))
+	@cd $(API_DIR) && \
+		TEST_API_BASE_URL=$(api_endpoint) TEST_CLIENTID=$(client_id) TEST_USERNAME=$(TEST_USERNAME) TEST_PASSWORD=$(TEST_PASSWORD) $(PYTEST_COMMAND) tests/integrationtests

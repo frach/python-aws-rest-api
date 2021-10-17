@@ -4,11 +4,11 @@ import pytest
 from decouple import config
 
 
-cognito_client = boto3.client('cognito-idp')
-
 TEST_USERNAME = config('TEST_USERNAME')
 TEST_PASSWORD = config('TEST_PASSWORD')
 TEST_CLIENTID = config('TEST_CLIENTID')
+
+cognito_client = boto3.client('cognito-idp')
 
 
 @pytest.fixture(scope="session", autouse=True)

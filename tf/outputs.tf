@@ -1,6 +1,16 @@
 output "api_default_stage_url" {
-  description = "An ARN of the bucket that stores images."
+  description = "Default stage URL if the API."
   value       = module.api.default_apigatewayv2_stage_invoke_url
+}
+
+output "api_api_endpoint" {
+  description = "The URI of the API."
+  value       = module.api.apigatewayv2_api_api_endpoint
+}
+
+output "api_id" {
+  description = "The API identifier."
+  value       = module.api.apigatewayv2_api_id
 }
 
 output "user_pool_endpoint" {
