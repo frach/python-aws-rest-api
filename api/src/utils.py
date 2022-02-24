@@ -33,7 +33,7 @@ def remove_keys_from_dumped_json(data: str, keys_to_remove: list):
     for key in keys_to_remove:
         try:
             del data[key]
-        except KeyError:
+        except (KeyError, TypeError):
             pass
 
     return json.dumps(data)

@@ -9,11 +9,11 @@ python-decouple = "3.4"
 pynamodb = "5.1.0"
 
 [dev-packages]
-boto3 = "*"
-pytest = "*"
-pytest-cov = "*"
-pytest-env = "*"
-tavern = "*"
+boto3 = "1.19.0"
+pytest = "6.2.5"
+pytest-cov = "3.0.0"
+pytest-env = "0.6.2"
+tavern = "1.16.3"
 
 [requires]
 python_version = "3.8"

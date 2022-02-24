@@ -1,5 +1,5 @@
 terraform {
-  required_version = ">= 1.0.4"
+  required_version = "= 1.0.9"
 }
 
 provider "aws" {
@@ -15,6 +15,7 @@ provider "aws" {
   # skip_requesting_account_id should be disabled to generate valid ARN in apigatewayv2_api_execution_arn
   skip_requesting_account_id = false
 }
+
 
 # COGNITO
 resource "aws_cognito_user_pool" "api_user_pool" {
@@ -60,6 +61,7 @@ resource "aws_cognito_user_pool_client" "api_user_pool_client" {
   user_pool_id        = aws_cognito_user_pool.api_user_pool.id
   explicit_auth_flows = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
 }
+
 
 # API GATEWAY
 resource "aws_apigatewayv2_authorizer" "api_authorizer" {
@@ -147,6 +149,7 @@ module "api" {
   }
 }
 
+
 # LAMBDA
 module "api_lambda" {
   source = "terraform-aws-modules/lambda/aws"
@@ -198,6 +201,7 @@ module "api_lambda" {
     Name = "${var.project}-${var.env}-api-lambda"
   }
 }
+
 
 # DYNAMODB
 module "items_table" {

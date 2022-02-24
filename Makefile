@@ -56,7 +56,7 @@ tests-unittests: $(VENV_DIR)
 tests-integrationtests: $(VENV_DIR)
 	$(info Getting outputs from terraform and running integration tests.)
 	$(eval outputs_json := `cd $(INFRA_DIR) && $(TERRAFORM_EXEC) output -json`)
-	$(eval api_endpoint := $(shell echo "$(outputs_json)" | jq -r .api_api_endpoint.value))
+	$(eval api_endpoint := $(shell echo "$(outputs_json)" | jq -r .api_url.value))
 	$(eval client_id := $(shell echo "$(outputs_json)" | jq -r .user_pool_client_id.value))
 	@cd $(API_DIR) && \
 		TEST_API_BASE_URL=$(api_endpoint) TEST_CLIENTID=$(client_id) TEST_USERNAME=$(TEST_USERNAME) TEST_PASSWORD=$(TEST_PASSWORD) $(PYTEST_COMMAND) tests/integrationtests

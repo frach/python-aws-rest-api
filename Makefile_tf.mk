@@ -1,5 +1,5 @@
 TERRAFORM_EXEC := $(abspath terraform)
-TERRAFORM_VERSION := 1.0.4
+TERRAFORM_VERSION := 1.0.9
 TERRAFORM_PKG := terraform_$(TERRAFORM_VERSION)_darwin_amd64.zip
 
 ENVS_DIR := envs

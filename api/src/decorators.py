@@ -1,12 +1,9 @@
-import boto3
-import sys, traceback
+import traceback
 
 from functools import wraps
-from json import dumps, loads
 
 from aws_lambda_powertools import Logger
 from aws_lambda_powertools.event_handler.exceptions import BadRequestError, InternalServerError, NotFoundError
-from aws_lambda_powertools.event_handler.api_gateway import Response
 from aws_lambda_powertools.middleware_factory import lambda_handler_decorator
 from aws_lambda_powertools.utilities.validation.exceptions import SchemaValidationError
 

@@ -83,8 +83,6 @@ stages:
       method: GET
       headers:
         Authorization: "Bearer {access_token}"
-      headers:
-        Authorization: "Bearer {access_token}"
     response:
       status_code: 200
       json:
