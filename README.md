@@ -7,15 +7,6 @@ while starting a new project.
 ## Configuration
 
 
-
-## Building
-
-TODO
-
-## Deploying
-
-TODO
-
 ## Testing
 
 ### Unittests
